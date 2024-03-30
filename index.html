@@ -33,10 +33,9 @@
             customCamera.components['gps-camera'].data['fakeGPS'] = true;
         });
 
-        // Listen for changes in camera position and update AR sphere position accordingly
-        customCamera.object3D.position.addChangeListener('position', () => {
-            const cameraPosition = customCamera.getAttribute('position');
-            arSphere.setAttribute('position', `${cameraPosition.x} ${cameraPosition.y} ${cameraPosition.z}`);
+        customCamera.addEventListener('gps-camera-update-position', (e) => {
+            const position = e.detail.position;
+            arSphere.setAttribute('position', `${position.x} ${position.y} ${position.z}`);
         });
     </script>
 </body>
