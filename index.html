@@ -6,19 +6,48 @@
     <title>AR Sphere</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.0.8/aframe/build/aframe-ar.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-        <!-- Creating a fake location using GPS coordinates (0,0) -->
-        <a-camera gps-camera rotation-reader></a-camera>
+        <!-- Creating a custom camera control -->
+        <a-camera id="custom-camera" rotation-reader></a-camera>
         
-        <!-- Placing the AR Sphere at (0,0,0) -->
+        <!-- Placing the AR Sphere -->
         <a-sphere position="0 0 0" radius="0.1" color="red"></a-sphere>
 
-        <!-- Lighting to enhance the scene -->
+        <!-- Lighting -->
         <a-light type="ambient" intensity="0.5"></a-light>
         <a-light type="point" intensity="0.5" position="2 4 0"></a-light>
     </a-scene>
+
+    <script>
+        // Set up fake GPS coordinates
+        const fakeGPS = {
+            latitude: 0, // Set latitude
+            longitude: 0 // Set longitude
+        };
+
+        // Set up custom camera control to update position based on fake GPS
+        const customCamera = document.querySelector('#custom-camera');
+        customCamera.setAttribute('gps-camera', {
+            fakeGPS: true,
+            latitude: fakeGPS.latitude,
+            longitude: fakeGPS.longitude
+        });
+
+        // Update camera position
+        function updateCameraPosition() {
+            customCamera.setAttribute('gps-camera', {
+                latitude: fakeGPS.latitude,
+                longitude: fakeGPS.longitude
+            });
+        }
+
+        // Call updateCameraPosition initially and periodically
+        updateCameraPosition();
+        setInterval(updateCameraPosition, 1000); // Update every second (adjust as needed)
+    </script>
 </body>
 </html>
 
