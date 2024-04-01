@@ -1,48 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR.js Camera Position</title>
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-</head>
-<body style="margin: 0; overflow: hidden;">
-  <a-scene embedded arjs="sourceType: webcam;">
-    <!-- Display the relative camera position -->
-    <a-entity id="cameraPosition" position="0 0 -5" text="value: Camera Position: 0 0 -5"></a-entity>
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <!-- Camera -->
+      <a-entity id="camera" camera position="0 1.6 0" look-controls>
+        <a-entity position="0 0 -5" geometry="primitive: box"></a-entity>
+      </a-entity>
 
-    <a-entity camera></a-entity>
-  </a-scene>
+      <!-- Display camera position -->
+      <a-entity id="positionDisplay" text="value: Position: 0 0 0;" position="0 3 -5"></a-entity>
 
-  <script>
-    // Get the camera element
-    var cameraEl = document.querySelector('[camera]');
+      <!-- Update camera position -->
+      <script>
+        AFRAME.registerComponent('position-updater', {
+          init: function () {
+            this.startingPosition = new THREE.Vector3();
+            this.cameraEl = document.getElementById('camera');
+            this.positionDisplayEl = document.getElementById('positionDisplay');
+            this.updateStartingPosition();
+          },
+          updateStartingPosition: function () {
+            this.startingPosition.copy(this.cameraEl.object3D.position);
+          },
+          tick: function () {
+            var cameraPos = this.cameraEl.object3D.position;
+            var relativePos = {
+              x: cameraPos.x - this.startingPosition.x,
+              y: cameraPos.y - this.startingPosition.y,
+              z: cameraPos.z - this.startingPosition.z
+            };
+            this.positionDisplayEl.setAttribute('text', 'value', 'Position: ' + relativePos.x.toFixed(2) + ' ' + relativePos.y.toFixed(2) + ' ' + relativePos.z.toFixed(2));
+          }
+        });
+      </script>
 
-    // Define the initial camera position
-    var initialCameraPos = null;
-
-    // Update initial camera position once the scene is loaded
-    cameraEl.addEventListener('loaded', function () {
-      initialCameraPos = this.object3D.position.clone();
-    });
-
-    // Update camera position on every frame
-    cameraEl.addEventListener('enterframe', function () {
-      // Check if initial camera position is set
-      if (initialCameraPos) {
-        // Get camera's current position
-        var cameraPos = this.object3D.position.clone();
-
-        // Calculate relative position from initial position
-        var relativePos = cameraPos.clone().sub(initialCameraPos);
-
-        // Update text entity to display relative camera position
-        var cameraPositionText = document.getElementById('cameraPosition');
-        cameraPositionText.setAttribute('text', 'value', 'Relative Camera Position: ' + relativePos.x.toFixed(2) + ' ' + relativePos.y.toFixed(2) + ' ' + relativePos.z.toFixed(2));
-      }
-    });
-  </script>
-</body>
+      <!-- Attach position updater to camera -->
+      <a-entity position-updater></a-entity>
+    </a-scene>
+  </body>
 </html>
 
