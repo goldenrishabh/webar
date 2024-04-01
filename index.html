@@ -24,15 +24,19 @@
 
       <script>
         let startingPosition = new THREE.Vector3();
+        let cameraPositionDisplay;
 
         AFRAME.registerComponent("camera-position-display", {
+          init: function () {
+            cameraPositionDisplay = document.getElementById(
+              "cameraPositionDisplay"
+            );
+          },
+
           tick: function () {
             let cameraPosition = this.el.sceneEl.camera.el.object3D.position;
             let offset = cameraPosition.clone().sub(startingPosition);
 
-            let cameraPositionDisplay = document.getElementById(
-              "cameraPositionDisplay"
-            );
             cameraPositionDisplay.setAttribute("position", {
               x: offset.x,
               y: offset.y,
@@ -44,6 +48,11 @@
         window.addEventListener("camera-init", () => {
           startingPosition = AFRAME.scenes[0].camera.el.object3D.position.clone();
         });
+
+        // Continuously update the camera position display
+        setInterval(() => {
+          AFRAME.scenes[0].camera.el.components["camera-position-display"].tick();
+        }, 50); // Update every 50 milliseconds
       </script>
     </a-scene>
   </body>
